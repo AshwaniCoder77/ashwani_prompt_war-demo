@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  role         String    @default("USER") // USER, ADMIN
+  bookings     Booking[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Venue {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  zones       Zone[]
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Zone {
+  id              String   @id @default(uuid())
+  venueId         String
+  venue           Venue    @relation(fields: [venueId], references: [id])
+  name            String
+  capacity        Int
+  currentLoad     Int      @default(0)
+  congestionLevel String   @default("low") // low, medium, high
+  waitTime        Int      @default(0)     // in minutes
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  venueId   String
+  venue     Venue    @relation(fields: [venueId], references: [id])
+  seat      String   // e.g. "Section 104, Row G, Seat 12"
+  createdAt DateTime @default(now())
+}
