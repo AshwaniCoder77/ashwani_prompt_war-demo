@@ -28,13 +28,8 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-const frontendPath = path.join(__dirname, "..", "mobile-app", "dist");
-// Fallback to public if dist doesn't exist
-if (!fs.existsSync(frontendPath)) {
-    console.log("Dist folder not found, using backend/public as fallback");
-}
+const frontendPath = path.join(__dirname, "public");
 app.use(express.static(frontendPath));
-app.use(express.static(path.join(__dirname, "public")));
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
