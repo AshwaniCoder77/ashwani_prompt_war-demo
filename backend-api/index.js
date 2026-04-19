@@ -38,17 +38,32 @@ app.use(
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
+          "'unsafe-eval'",
           "https://www.google.com",
           "https://www.gstatic.com",
           "https://maps.googleapis.com",
+          "https://accounts.google.com"
         ],
         connectSrc: [
           "'self'",
           "https://maps.googleapis.com",
           "https://www.google.com",
+          "https://accounts.google.com"
         ],
-        imgSrc: ["'self'", "data:", "https://maps.gstatic.com"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: [
+          "'self'", 
+          "data:", 
+          "blob:",
+          "https://maps.gstatic.com", 
+          "https://maps.googleapis.com",
+          "https://*.ggpht.com"
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://fonts.googleapis.com"],
+        frameSrc: [
+          "'self'",
+          "https://www.google.com",
+          "https://accounts.google.com"
+        ]
       },
     },
   })
