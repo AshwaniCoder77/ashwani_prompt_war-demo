@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -16,11 +17,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
-<<<<<<< HEAD
-=======
     "firebase-admin": "^13.8.0",
     "google-auth-library": "^10.6.2",
->>>>>>> 51dbaa4 (Initial commit)
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "socket.io": "^4.8.3"
