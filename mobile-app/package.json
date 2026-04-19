@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@react-google-maps/api": "^2.20.8",
+    "@react-oauth/google": "^0.13.5",
+>>>>>>> 51dbaa4 (Initial commit)
     "lucide-react": "^1.8.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
