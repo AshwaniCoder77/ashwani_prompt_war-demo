@@ -4,8 +4,8 @@ import { Map, Bell, User, Ticket, CreditCard, X, ShieldAlert, Navigation, Settin
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-const MAPS_API_KEY = import.meta.env.VITE_MAPS_API_KEY;
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const MAPS_API_KEY = import.meta.env.VITE_MAPS_API_KEY || "AIzaSyA8JducfWX7J2-yUkkLFuwUeeVdsWsXxqA";
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "666422970821-g87nbhojue4h457h8rp14cjt781reh63.apps.googleusercontent.com";
 const stadiumLocation = { lat: 28.582875, lng: 77.234375 };
 const mapContainerStyle = { width: '100%', height: '300px', borderRadius: '12px', marginTop: '16px', border: '1px solid rgba(255,255,255,0.1)' };
 

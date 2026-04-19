@@ -102,10 +102,11 @@ async function createAssessment(token) {
     if (!token) return null;
 
     try {
-        const auth = new GoogleAuth({
-            keyFile: path.join(__dirname, 'serviceAccountKey.json'),
-            scopes: 'https://www.googleapis.com/auth/cloud-platform',
-        });
+        const authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
+        if (process.env.NODE_ENV !== "production") {
+            authOptions.keyFile = path.join(__dirname, 'serviceAccountKey.json');
+        }
+        const auth = new GoogleAuth(authOptions);
         const client = await auth.getClient();
         const url = `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments`;
 
