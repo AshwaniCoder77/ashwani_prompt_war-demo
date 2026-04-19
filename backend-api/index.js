@@ -16,16 +16,47 @@ const admin = require('firebase-admin');
 dotenv.config();
 
 // --- FIREBASE INITIALIZATION ---
-const serviceAccount = require('./serviceAccountKey.json');
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+try {
+    const serviceAccount = require('./serviceAccountKey.json');
+    if (Object.keys(serviceAccount).length > 0) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log("Firestore initialized manually for project:", serviceAccount.project_id);
+    } else {
+        throw new Error("Empty service account JSON");
+    }
+} catch (error) {
+    console.log("Using Application Default Credentials for Firestore (Cloud Environment).");
+    admin.initializeApp();
+}
 const db = admin.firestore();
-console.log("Firestore initialized for project:", serviceAccount.project_id);
 
 const app = express();
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://www.google.com",
+          "https://www.gstatic.com",
+          "https://maps.googleapis.com",
+        ],
+        connectSrc: [
+          "'self'",
+          "https://maps.googleapis.com",
+          "https://www.google.com",
+        ],
+        imgSrc: ["'self'", "data:", "https://maps.gstatic.com"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
 app.use(express.json());
 
 const frontendPath = path.join(__dirname, "public");
