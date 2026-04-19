@@ -624,7 +624,7 @@ app.use((req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
+const PORT = parseInt(process.env.PORT) || 8080;
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend server with Geolocation GPS Tracking running on port ${PORT}`);
 });
