@@ -90,6 +90,7 @@ function App() {
       socket.disconnect();
       if (watchId) navigator.geolocation.clearWatch(watchId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, activeTab, userRole]);
 
   useEffect(() => {
@@ -120,6 +121,7 @@ function App() {
       fetchSeats();
       if (userRole === "ADMIN") fetchAdminData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, activeTab]);
 
   const fetchBookings = async () => {
@@ -127,7 +129,7 @@ function App() {
       const res = await fetch(`${API_URL}/my-bookings`, { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) setBookings(await res.json());
       else if (res.status === 401 || res.status === 403) logout();
-    } catch (e) { }
+    } catch (e) { console.error(e); }
   };
 
   const fetchSeats = async () => {
@@ -138,7 +140,7 @@ function App() {
         setSeats(data.seats);
         setSeatPrice(data.currentPrice);
       } else if (res.status === 401 || res.status === 403) logout();
-    } catch (e) { }
+    } catch (e) { console.error(e); }
   };
 
   const fetchAdminData = async () => {
@@ -146,7 +148,7 @@ function App() {
       const res = await fetch(`${API_URL}/admin/dashboard`, { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) setAdminData(await res.json());
       else if (res.status === 401 || res.status === 403) logout();
-    } catch (e) { }
+    } catch (e) { console.error(e); }
   }
 
   const handleAuth = async (e) => {
@@ -168,6 +170,7 @@ function App() {
         localStorage.setItem('userRole', data.user.role || 'USER');
       } else alert(data.error);
     } catch (e) {
+      console.error(e);
       alert("Error reaching server");
     }
   };
@@ -188,6 +191,7 @@ function App() {
         localStorage.setItem('userRole', data.user.role || 'USER');
       } else { alert(data.error); }
     } catch (e) {
+      console.error(e);
       alert('Failed to authenticate with Google on backend.');
     }
   };
@@ -285,6 +289,7 @@ function App() {
         alert("Broadcast failed: " + (data.error || "Unknown error"));
       }
     } catch (e) {
+      console.error(e);
       alert("Network error while broadcasting");
     }
   };
@@ -307,6 +312,7 @@ function App() {
         alert("Update failed: " + (data.error || "Unknown error"));
       }
     } catch (e) {
+      console.error(e);
       alert("Network error while updating zone");
     }
   }
@@ -332,6 +338,7 @@ function App() {
         alert("Price update failed: " + (data.error || "Unknown error"));
       }
     } catch (e) {
+      console.error(e);
       alert("Network error while updating price");
     }
   }
@@ -351,6 +358,7 @@ function App() {
         alert("Failed to end match: " + (data.error || "Unknown error"));
       }
     } catch (e) {
+      console.error(e);
       alert("Network error while ending match");
     }
   };
