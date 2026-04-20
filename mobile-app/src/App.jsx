@@ -364,7 +364,7 @@ function App() {
     }
   };
 
-
+  if (!token) {
     return (
       <main style={{ padding: '40px 20px', width: '100%' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '32px' }}>FlowVenue Security Phase</h1>
