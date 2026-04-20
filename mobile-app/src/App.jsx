@@ -64,6 +64,7 @@ function App() {
     socket.on('venue_update', (data) => setZones(data));
     socket.on('seat_update', () => fetchSeats());
     socket.on('price_update', (newPrice) => setSeatPrice(newPrice));
+    socket.on('all_broadcasts', (msgs) => setBroadcasts(msgs));
     socket.on('official_broadcast', (msg) => {
       setBroadcasts(prev => [msg, ...prev]);
       if (activeTab !== 'inbox' && userRole !== 'ADMIN') {
@@ -373,9 +374,9 @@ function App() {
           <form onSubmit={handleAuth}>
             {isRegistering && <div className="form-group"><input className="form-input" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} /></div>}
             <div className="form-group">
-              <input className="form-input" type="email" placeholder="Email (admin@flow.com for Admin)" required value={email} onChange={e => setEmail(e.target.value)} />
+              <input className="form-input" type="email" placeholder="Email" required value={email} onChange={e => setEmail(e.target.value)} />
             </div>
-            <div className="form-group"><input className="form-input" type="password" placeholder="Password ('admin' for Admin)" required value={password} onChange={e => setPassword(e.target.value)} /></div>
+            <div className="form-group"><input className="form-input" type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} /></div>
             <button className="btn-primary" type="submit">{isRegistering ? 'Sign Up' : 'Log In'}</button>
           </form>
           <div style={{ marginTop: '16px', textAlign: 'center' }}>

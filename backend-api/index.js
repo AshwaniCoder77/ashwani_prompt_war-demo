@@ -184,6 +184,20 @@ let SEAT_PRICE = 50;
     }
 })();
 
+let BROADCASTS = [];
+(async () => {
+    try {
+        const snapshot = await db.collection('broadcasts').orderBy('timestamp', 'desc').get();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            data.timestamp = data.timestamp.toDate ? data.timestamp.toDate() : data.timestamp;
+            BROADCASTS.push(data);
+        });
+    } catch (e) {
+        console.error("Broadcasts Load Error", e);
+    }
+})();
+
 // --- REAL GPS TRACKING LOGIC ---
 const STADIUM_LAT = 28.582875; // Plus Code: H6MM+5P9, New Delhi
 const STADIUM_LNG = 77.234375;
@@ -257,6 +271,7 @@ function calculateActualCrowsMath() {
 
 io.on("connection", (socket) => {
     socket.emit("venue_update", ZONES);
+    socket.emit("all_broadcasts", BROADCASTS);
 
     socket.on("update_location", (coords) => {
         if (coords && coords.lat && coords.lng) {
@@ -378,7 +393,7 @@ app.post("/api/admin/zone-update", requireAuth, requireAdmin, (req, res) => {
     res.status(404).json({ error: "Zone not found" });
 });
 
-app.post("/api/admin/broadcast", requireAuth, requireAdmin, (req, res) => {
+app.post("/api/admin/broadcast", requireAuth, requireAdmin, async (req, res) => {
     const { message, source } = req.body;
     if (!message) return res.status(400).json({ error: "Message required" });
     const notification = {
@@ -387,8 +402,15 @@ app.post("/api/admin/broadcast", requireAuth, requireAdmin, (req, res) => {
         message: message,
         timestamp: new Date()
     };
-    io.emit("official_broadcast", notification);
-    res.json({ success: true, notification });
+    
+    try {
+        await db.collection('broadcasts').doc(notification.id).set(notification);
+        BROADCASTS.unshift(notification);
+        io.emit("official_broadcast", notification);
+        res.json({ success: true, notification });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 
@@ -598,22 +620,29 @@ app.get("/api/admin/dashboard", requireAuth, requireAdmin, async (req, res) => {
 app.post("/api/admin/match-over", requireAuth, requireAdmin, async (req, res) => {
     try {
         const bookingsSnapshot = await db.collection('bookings').get();
-        if (bookingsSnapshot.empty) {
-            return res.json({ message: "No active bookings to clear." });
-        }
-
         const batch = db.batch();
         const archivedRef = db.collection('archivedBookings');
 
-        bookingsSnapshot.docs.forEach(doc => {
-            const data = doc.data();
-            const archiveDoc = archivedRef.doc(doc.id);
-            batch.set(archiveDoc, { ...data, archivedAt: new Date() });
-            batch.delete(doc.ref);
-        });
+        if (!bookingsSnapshot.empty) {
+            bookingsSnapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const archiveDoc = archivedRef.doc(doc.id);
+                batch.set(archiveDoc, { ...data, archivedAt: new Date() });
+                batch.delete(doc.ref);
+            });
+        }
+
+        const broadcastsSnapshot = await db.collection('broadcasts').get();
+        if (!broadcastsSnapshot.empty) {
+            broadcastsSnapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+        }
+        BROADCASTS = [];
 
         await batch.commit();
         io.emit('seat_update');
+        io.emit('all_broadcasts', BROADCASTS);
         res.json({ message: "Match over. All seats are now free and data is archived in Firestore." });
     } catch (e) {
         res.status(500).json({ error: e.message });
