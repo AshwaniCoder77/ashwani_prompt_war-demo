@@ -7,6 +7,10 @@
     <title>FlowVenue Mobile</title>
 
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld7pb4sAAAAAKdIn1hceH9fxd9iJj03LORY5yWn"></script>
+    <script>
+      window.onerror = function(msg, url, line) { alert('FATAL ERROR on line ' + line + ':\n' + msg); };
+      window.onunhandledrejection = function(e) { alert('ASYNC ERROR:\n' + e.reason); };
+    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>

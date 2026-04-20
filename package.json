@@ -5,5 +5,8 @@
   "scripts": {
     "build": "cd backend-api && npm install && cd ../mobile-app && npm install && npm run build && node -e \"require('fs').cpSync('dist', '../backend-api/public', {recursive:true, force:true})\"",
     "start": "cd backend-api && node index.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.41.0"
   }
 }

@@ -71,7 +71,15 @@ app.use(
 app.use(express.json());
 
 const frontendPath = path.join(__dirname, "public");
-app.use(express.static(frontendPath));
+app.use(express.static(frontendPath, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -650,6 +658,9 @@ app.post("/api/admin/match-over", requireAuth, requireAdmin, async (req, res) =>
 });
 
 app.use((req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.sendFile(path.join(frontendPath, "index.html"));
 });
 
