@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://flow-venue-service-666422970821.us-central1.run.app/sitemap.xml

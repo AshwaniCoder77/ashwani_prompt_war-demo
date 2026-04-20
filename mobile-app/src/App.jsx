@@ -365,22 +365,36 @@ function App() {
   };
 
 
-  if (!token) {
     return (
-      <div style={{ padding: '40px 20px', width: '100%' }}>
+      <main style={{ padding: '40px 20px', width: '100%' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '32px' }}>FlowVenue Security Phase</h1>
-        <div className="glass-panel">
+        <article className="glass-panel">
           <h2 style={{ marginBottom: '16px' }}>{isRegistering ? 'Create Account' : 'Log In'}</h2>
-          <form onSubmit={handleAuth}>
-            {isRegistering && <div className="form-group"><input className="form-input" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} /></div>}
+          <form onSubmit={handleAuth} aria-label={isRegistering ? "Registration Form" : "Login Form"}>
+            {isRegistering && (
+              <div className="form-group">
+                <label htmlFor="reg-name" className="sr-only">Full Name</label>
+                <input id="reg-name" className="form-input" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} />
+              </div>
+            )}
             <div className="form-group">
-              <input className="form-input" type="email" placeholder="Email" required value={email} onChange={e => setEmail(e.target.value)} />
+              <label htmlFor="auth-email" className="sr-only">Email</label>
+              <input id="auth-email" className="form-input" type="email" placeholder="Email" required value={email} onChange={e => setEmail(e.target.value)} />
             </div>
-            <div className="form-group"><input className="form-input" type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} /></div>
+            <div className="form-group">
+              <label htmlFor="auth-pass" className="sr-only">Password</label>
+              <input id="auth-pass" className="form-input" type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} />
+            </div>
             <button className="btn-primary" type="submit">{isRegistering ? 'Sign Up' : 'Log In'}</button>
           </form>
           <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer' }} onClick={() => setIsRegistering(!isRegistering)}>
+            <span 
+              role="button" 
+              tabIndex="0"
+              style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer' }} 
+              onClick={() => setIsRegistering(!isRegistering)}
+              onKeyDown={(e) => e.key === 'Enter' && setIsRegistering(!isRegistering)}
+            >
               {isRegistering ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
             </span>
           </div>
@@ -392,41 +406,44 @@ function App() {
                 onError={() => alert('Google Sign In failed')}
                 theme="outline"
                 shape="pill"
+                text="signin_with"
+                aria-label="Sign in with Google"
               />
             </GoogleOAuthProvider>
           </div>
-        </div>
-      </div>
+        </article>
+      </main>
     );
-  }
 
   return (
     <>
-      <header className="app-header">
+      <header className="app-header" role="banner">
         <div>
           <h1 style={{ marginBottom: 0 }}>FlowVenue</h1>
           <span className="subtitle">High Security Ticket & Tracking</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} role="status" aria-live="polite">
           {userLocation ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} title={`Mock lat: ${userLocation.lat.toFixed(3)}, lng: ${userLocation.lng.toFixed(3)}`}>
-              <MapPin size={14} color="var(--status-low)" />
+              <MapPin size={14} color="var(--status-low)" aria-hidden="true" />
               <span style={{ fontSize: '10px', background: 'var(--status-low)', color: 'black', padding: '2px 6px', borderRadius: '4px' }}>GPS Lock OK</span>
             </div>
           ) : (
             <span style={{ fontSize: '10px', background: 'var(--text-secondary)', color: 'black', padding: '2px 6px', borderRadius: '4px' }}>No GPS</span>
           )}
           <span className="subtitle" style={{ fontSize: '10px' }}>{socketConnected ? 'LIVE' : 'CONNECTING...'}</span>
-          <div className={`status-indicator ${socketConnected ? 'low' : 'high'}`} />
+          <div className={`status-indicator ${socketConnected ? 'low' : 'high'}`} aria-hidden="true" />
         </div>
       </header>
 
       {showPaymentModal && (
-        <div className="modal-overlay">
+        <section className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
           <div className="modal-content fade-in" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ marginBottom: 0 }}>{userRole === "ADMIN" ? 'Proxy Assign (Admin)' : 'Secure Bulk Checkout'}</h2>
-              <X size={24} style={{ cursor: 'pointer' }} onClick={() => setShowPaymentModal(false)} />
+              <h2 id="modal-title" style={{ marginBottom: 0 }}>{userRole === "ADMIN" ? 'Proxy Assign (Admin)' : 'Secure Bulk Checkout'}</h2>
+              <button aria-label="Close modal" style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }} onClick={() => setShowPaymentModal(false)}>
+                <X size={24} />
+              </button>
             </div>
 
             {userRole !== "ADMIN" && <h3 style={{ margin: '12px 0' }}>Total Cost: ₹{selectedSeats.length * seatPrice}.00</h3>}
@@ -476,7 +493,7 @@ function App() {
               </button>
             </form>
           </div>
-        </div>
+        </section>
       )}
 
       <main className="app-content fade-in">
@@ -502,9 +519,22 @@ function App() {
                 else cls += 'seat-empty';
 
                 return (
-                  <div key={seat.id} className={cls} onClick={() => {
+                <div 
+                  key={seat.id} 
+                  role="button"
+                  tabIndex={seat.status === 'empty' ? 0 : -1}
+                  aria-label={`Seat ${seat.id}${seat.status === 'occupied' ? ' - Occupied' : selectedSeats.includes(seat.id) ? ' - Selected' : ' - Available'}`}
+                  className={cls} 
+                  onClick={() => {
                     if (seat.status === 'empty') toggleSeat(seat.id);
-                  }}>{seat.id}</div>
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (seat.status === 'empty') toggleSeat(seat.id);
+                    }
+                  }}
+                >{seat.id}</div>
                 )
               })}
             </div>
@@ -722,28 +752,28 @@ function App() {
         )}
       </main>
 
-      <nav className="bottom-nav">
-        <div className={`nav-item ${activeTab === 'map' ? 'active' : ''}`} onClick={() => setActiveTab('map')}>
-          <Map size={24} /><span>Map</span>
+      <nav className="bottom-nav" role="navigation" aria-label="Main Navigation">
+        <div className={`nav-item ${activeTab === 'map' ? 'active' : ''}`} onClick={() => setActiveTab('map')} role="button" tabIndex="0" aria-label="Stadium Map">
+          <Map size={24} aria-hidden="true" /><span>Map</span>
         </div>
         {userRole === 'ADMIN' ? (
-          <div className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`} onClick={() => setActiveTab('admin')}>
-            <ShieldAlert size={24} /><span>Admin</span>
+          <div className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`} onClick={() => setActiveTab('admin')} role="button" tabIndex="0" aria-label="Admin Dashboard">
+            <ShieldAlert size={24} aria-hidden="true" /><span>Admin</span>
           </div>
         ) : (
-          <div className={`nav-item ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>
-            <Bell size={24} /><span>Alerts</span>
+          <div className={`nav-item ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')} role="button" tabIndex="0" aria-label="Live Alerts">
+            <Bell size={24} aria-hidden="true" /><span>Alerts</span>
           </div>
         )}
-        <div className={`nav-item ${activeTab === 'inbox' ? 'active' : ''}`} onClick={() => setActiveTab('inbox')}>
+        <div className={`nav-item ${activeTab === 'inbox' ? 'active' : ''}`} onClick={() => setActiveTab('inbox')} role="button" tabIndex="0" aria-label="Inbox">
           <div style={{ position: 'relative' }}>
-            <MessageSquareWarning size={24} />
-            {broadcasts.length > 0 && <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', background: 'red', borderRadius: '50%' }} />}
+            <MessageSquareWarning size={24} aria-hidden="true" />
+            {broadcasts.length > 0 && <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', background: 'red', borderRadius: '50%' }} aria-label="New message notification" />}
           </div>
           <span>Inbox</span>
         </div>
-        <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
-          <User size={24} /><span>Profile</span>
+        <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')} role="button" tabIndex="0" aria-label="My Profile">
+          <User size={24} aria-hidden="true" /><span>Profile</span>
         </div>
       </nav>
     </>
