@@ -414,6 +414,7 @@ function App() {
         </article>
       </main>
     );
+  }
 
   return (
     <>
